@@ -12,15 +12,9 @@ import {
 const LANGS = ["zh-Hant", "en", "ja", "ko"];
 
 const copy = {
-  current: ["目前議程", "Current session", "現在のセッション", "현재 세션"],
-  previous: ["上一場議程", "Previous session", "前のセッション", "이전 세션"],
+  current: ["當場議程", "Current session", "現在のセッション", "현재 세션"],
+  previous: ["前一場議程", "Previous session", "前のセッション", "이전 세션"],
   openForm: ["前往填寫回饋", "Open feedback form", "フィードバックを記入", "피드백 작성"],
-  noPrevious: [
-    "這個場地在同一天沒有更早的議程資料。",
-    "No earlier session was found in this room on the same day.",
-    "同じ日のこの会場に、これより前のセッションはありません。",
-    "같은 날 이 장소에서 더 이른 세션을 찾지 못했습니다.",
-  ],
   trackUnavailable: [
     "議程軌暫時無法載入（表單不會誤填語言）",
     "Track unavailable (language will not be used by mistake)",
@@ -32,6 +26,9 @@ const copy = {
 const statusPanel = document.querySelector(".status-panel");
 const statusMessage = document.querySelector("#status-message");
 const sessionResults = document.querySelector("#session-results");
+const sessionSwitcher = document.querySelector(".session-switcher");
+const currentSwitch = document.querySelector('[data-session-target="current"]');
+const previousSwitch = document.querySelector('[data-session-target="previous"]');
 const currentSlot = document.querySelector("#current-session");
 const previousSlot = document.querySelector("#previous-session");
 const lookup = document.querySelector("#session-lookup");
@@ -87,12 +84,12 @@ function renderSessionCard(slot, session, labels) {
   slot.append(card);
 }
 
-function renderEmptyPrevious() {
-  previousSlot.replaceChildren();
-  const empty = document.createElement("div");
-  empty.className = "empty-card";
-  addLanguageLines(empty, copy.noPrevious);
-  previousSlot.append(empty);
+function selectSessionSlot(target) {
+  const showCurrent = target === "current";
+  currentSlot.hidden = !showCurrent;
+  previousSlot.hidden = showCurrent;
+  currentSwitch.setAttribute("aria-pressed", String(showCurrent));
+  previousSwitch.setAttribute("aria-pressed", String(!showCurrent));
 }
 
 async function hydrateTrack(session) {
@@ -142,8 +139,15 @@ async function showSession(sessionId) {
   if (version !== renderVersion) return;
 
   renderSessionCard(currentSlot, current, copy.current);
-  if (previous) renderSessionCard(previousSlot, previous, copy.previous);
-  else renderEmptyPrevious();
+  if (previous) {
+    renderSessionCard(previousSlot, previous, copy.previous);
+    sessionSwitcher.hidden = false;
+    selectSessionSlot("current");
+  } else {
+    previousSlot.replaceChildren();
+    sessionSwitcher.hidden = true;
+    selectSessionSlot("current");
+  }
 
   sessionResults.hidden = false;
   const hasMissingTrack = !current.trackName || (previous && !previous.trackName);
@@ -161,6 +165,9 @@ async function showSession(sessionId) {
     statusPanel.hidden = true;
   }
 }
+
+currentSwitch.addEventListener("click", () => selectSessionSlot("current"));
+previousSwitch.addEventListener("click", () => selectSessionSlot("previous"));
 
 function updateSessionInUrl(sessionId) {
   const url = new URL(window.location.href);

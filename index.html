@@ -6,11 +6,11 @@
     <meta name="theme-color" content="#20c779" />
     <meta
       name="description"
-      content="選擇 COSCUP 2026 目前或上一場議程，核對講者與議程軌後前往回饋表單。"
+      content="選擇 COSCUP 2026 當場或前一場議程，核對講者與議程軌後前往回饋表單。"
     />
     <title>COSCUP 2026 議程回饋｜Session Feedback</title>
     <link rel="icon" type="image/svg+xml" href="https://coscup.org/2026/favicon.svg" />
-    <link rel="stylesheet" href="./styles.css?v=20260804-focus-1" />
+    <link rel="stylesheet" href="./styles.css?v=20260804-focus-2" />
   </head>
   <body>
     <header class="site-header">
@@ -61,8 +61,41 @@
         </section>
 
         <section id="session-results" class="session-grid" aria-label="可回饋的議程" hidden>
+          <div
+            class="session-switcher"
+            role="group"
+            aria-label="議程切換 / Session switcher / セッション切り替え / 세션 전환"
+            hidden
+          >
+            <button
+              id="show-current-session"
+              class="session-switcher__button session-switcher__button--current"
+              type="button"
+              aria-controls="current-session"
+              aria-pressed="true"
+              data-session-target="current"
+            >
+              <span lang="zh-Hant">當場議程</span>
+              <span lang="en">Current session</span>
+              <span lang="ja">現在のセッション</span>
+              <span lang="ko">현재 세션</span>
+            </button>
+            <button
+              id="show-previous-session"
+              class="session-switcher__button session-switcher__button--previous"
+              type="button"
+              aria-controls="previous-session"
+              aria-pressed="false"
+              data-session-target="previous"
+            >
+              <span lang="zh-Hant">前一場議程</span>
+              <span lang="en">Previous session</span>
+              <span lang="ja">前のセッション</span>
+              <span lang="ko">이전 세션</span>
+            </button>
+          </div>
           <article id="current-session" class="session-slot"></article>
-          <article id="previous-session" class="session-slot"></article>
+          <article id="previous-session" class="session-slot" hidden></article>
         </section>
 
         <section id="session-lookup" class="lookup" hidden>
@@ -138,6 +171,6 @@
       </a>
     </template>
 
-    <script type="module" src="./app.js?v=20260804-focus-1"></script>
+    <script type="module" src="./app.js?v=20260804-focus-2"></script>
   </body>
 </html>
