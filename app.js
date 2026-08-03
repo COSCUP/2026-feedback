@@ -55,6 +55,7 @@ function addLanguageLines(container, lines, className = "language-line") {
 }
 
 function setStatus(lines, state = "loading") {
+  statusPanel.hidden = false;
   addLanguageLines(statusMessage, lines, "status-line");
   statusPanel.dataset.state = state;
 }
@@ -146,22 +147,19 @@ async function showSession(sessionId) {
 
   sessionResults.hidden = false;
   const hasMissingTrack = !current.trackName || (previous && !previous.trackName);
-  setStatus(
-    hasMissingTrack
-      ? [
-          "議程已載入；部分議程軌無法取得，表單將保留空白供確認。",
-          "Sessions loaded; unavailable tracks are left blank for confirmation.",
-          "セッションを読み込みました。取得できないトラックは確認用に空欄にします。",
-          "세션을 불러왔습니다. 확인할 수 없는 트랙은 빈칸으로 둡니다.",
-        ]
-      : [
-          "議程與議程軌已核對。請選擇要回饋的議程。",
-          "Session and track verified. Choose a session to leave feedback.",
-          "セッションとトラックを確認しました。フィードバックするセッションを選んでください。",
-          "세션과 트랙을 확인했습니다. 피드백할 세션을 선택해 주세요.",
-        ],
-    "ready",
-  );
+  if (hasMissingTrack) {
+    setStatus(
+      [
+        "議程已載入；部分議程軌無法取得，表單將保留空白供確認。",
+        "Sessions loaded; unavailable tracks are left blank for confirmation.",
+        "セッションを読み込みました。取得できないトラックは確認用に空欄にします。",
+        "세션을 불러왔습니다. 확인할 수 없는 트랙은 빈칸으로 둡니다.",
+      ],
+      "error",
+    );
+  } else {
+    statusPanel.hidden = true;
+  }
 }
 
 function updateSessionInUrl(sessionId) {
@@ -208,15 +206,7 @@ async function init() {
     if (sessionId) {
       await showSession(sessionId);
     } else {
-      setStatus(
-        [
-          "請在網址加入 ?session=議程ID，或在下方輸入 session ID。",
-          "Add ?session=SESSION_ID to the URL, or enter a session ID below.",
-          "URL に ?session=セッションID を追加するか、下に ID を入力してください。",
-          "URL에 ?session=세션ID를 추가하거나 아래에 세션 ID를 입력해 주세요.",
-        ],
-        "ready",
-      );
+      statusPanel.hidden = true;
       sessionInput.focus();
     }
   } catch (error) {
