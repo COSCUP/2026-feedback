@@ -224,9 +224,17 @@ h1 span:nth-child(2) {
 }
 
 .page-content {
+  display: flex;
   width: min(1180px, calc(100% - 32px));
+  flex-direction: column;
   margin: 0 auto;
   padding: clamp(38px, 6vw, 72px) 0;
+}
+
+body[data-mode="lookup"] .lookup {
+  order: -1;
+  margin-top: 0;
+  margin-bottom: 24px;
 }
 
 .status-panel {
@@ -535,6 +543,14 @@ h1 span:nth-child(2) {
   translate: 2px 2px;
 }
 
+.lookup button:disabled {
+  box-shadow: 2px 2px 0 var(--ink);
+  cursor: wait;
+  filter: grayscale(0.35);
+  opacity: 0.65;
+  translate: 0;
+}
+
 footer {
   display: flex;
   justify-content: space-between;
@@ -579,20 +595,243 @@ footer a {
 
 @media (max-width: 720px) {
   .site-header {
-    align-items: flex-start;
+    min-height: 52px;
+    align-items: center;
+    padding: 7px 10px;
   }
 
   .header-title {
     display: grid;
     gap: 1px;
+    font-size: 8px;
+    line-height: 1.15;
+  }
+
+  .wordmark {
+    gap: 5px;
+    padding: 3px 4px 3px 8px;
+    box-shadow: 2px 2px 0 var(--ink);
+  }
+
+  .site-logo {
+    width: 70px;
+    height: 22px;
+  }
+
+  .wordmark-kicker {
+    min-width: 38px;
+    height: 23px;
+    font-size: 9px;
+  }
+
+  .hero-shell {
+    padding: 3px 0 18px;
+  }
+
+  .hero-shell::before,
+  .hero-shell::after {
+    width: 54px;
+    height: 12px;
+  }
+
+  .hero-visual {
+    width: min(100%, 350px);
+  }
+
+  .hero-copy {
+    width: min(100% - 24px, 42rem);
+    margin-top: 8px;
+    gap: 8px;
+  }
+
+  .eyebrow {
+    margin: 0 0 2px;
+    font-size: 8px;
+    letter-spacing: 0.11em;
+    overflow-wrap: anywhere;
+  }
+
+  h1 span:first-child {
+    max-width: none;
+    font-size: 31px;
+    letter-spacing: -0.05em;
+  }
+
+  h1 span:not(:first-child) {
+    margin-top: 3px;
+    font-size: 12px;
+    letter-spacing: -0.02em;
+  }
+
+  h1 span:nth-child(2) {
+    margin-top: 8px;
+    text-shadow: 1px 1px 0 var(--sea-dark);
+  }
+
+  .hero-intro {
+    display: none;
   }
 
   .session-grid {
     grid-template-columns: 1fr;
+    gap: 12px;
   }
 
   .page-content {
-    width: min(100% - 20px, 42rem);
+    width: min(100% - 16px, 42rem);
+    padding: 16px 0 24px;
+  }
+
+  .status-panel {
+    gap: 8px;
+    margin-bottom: 12px;
+    padding: 9px 10px;
+    border-width: 2px;
+    border-radius: 12px;
+    box-shadow: 3px 3px 0 var(--ink);
+  }
+
+  .status-panel p {
+    font-size: 9px;
+    line-height: 1.25;
+  }
+
+  .status-panel__dot {
+    width: 9px;
+    height: 9px;
+    margin-top: 2px;
+  }
+
+  body[data-mode="lookup"] .status-panel[data-state="ready"] {
+    display: none;
+  }
+
+  .session-card {
+    padding: 14px;
+    border-width: 2px;
+    border-radius: 16px;
+    box-shadow: 4px 5px 0 var(--ink);
+  }
+
+  .session-card__label {
+    display: grid;
+    padding: 5px 8px;
+    grid-template-columns: repeat(2, max-content);
+    gap: 1px 8px;
+    border-width: 1.5px;
+    border-radius: 10px;
+    font-size: 8px;
+  }
+
+  .session-card__title {
+    margin: 12px 0 13px;
+    font-size: 20px;
+    line-height: 1.2;
+  }
+
+  .session-card__meta {
+    margin-bottom: 11px;
+    border-top-width: 1.5px;
+  }
+
+  .session-card__meta div {
+    grid-template-columns: 78px minmax(0, 1fr);
+    gap: 9px;
+    padding: 6px 0;
+  }
+
+  .session-card__meta dt {
+    font-size: 7.5px;
+    line-height: 1.25;
+  }
+
+  .session-card__meta dd {
+    font-size: 11px;
+    line-height: 1.3;
+  }
+
+  .session-card__speaker dd {
+    font-size: 13px;
+  }
+
+  .session-card__action {
+    gap: 10px;
+    padding-top: 2px;
+  }
+
+  .session-card__action b {
+    font-size: 13px;
+  }
+
+  .session-card__action small {
+    font-size: 7.5px;
+  }
+
+  .session-card__action i {
+    width: 34px;
+    height: 34px;
+    border-width: 1.5px;
+    font-size: 17px;
+  }
+
+  .empty-card {
+    min-height: 130px;
+    padding: 18px;
+    border-width: 2px;
+    border-radius: 16px;
+    font-size: 9px;
+  }
+
+  .lookup {
+    gap: 10px;
+    margin-top: 16px;
+    padding: 14px;
+    border-width: 2px;
+    border-radius: 14px;
+    box-shadow: 4px 5px 0 var(--ink);
+  }
+
+  body[data-mode="lookup"] .lookup {
+    margin-bottom: 0;
+  }
+
+  .lookup h2 {
+    font-size: 11px;
+    line-height: 1.22;
+  }
+
+  .lookup h2 span:first-child {
+    margin-bottom: 3px;
+    font-size: 18px;
+  }
+
+  .lookup p {
+    margin-top: 7px;
+    font-size: 8px;
+    line-height: 1.25;
+  }
+
+  .lookup__form label {
+    margin-bottom: 4px;
+    font-size: 9px;
+  }
+
+  .lookup input,
+  .lookup button {
+    min-height: 44px;
+    border-width: 1.5px;
+    border-radius: 10px;
+  }
+
+  .lookup input {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+
+  .lookup button {
+    min-width: 78px;
+    padding: 5px 9px;
+    font-size: 8px;
   }
 
   footer {
@@ -603,34 +842,11 @@ footer a {
 @media (max-width: 480px) {
   .site-header {
     gap: 10px;
-    padding: 9px 10px;
-  }
-
-  .site-logo {
-    width: 72px;
-    height: 24px;
-  }
-
-  .wordmark-kicker {
-    min-width: 41px;
-    height: 25px;
-    font-size: 10px;
+    padding: 7px 8px;
   }
 
   .header-title {
     font-size: 9px;
-  }
-
-  .hero-shell {
-    padding-bottom: 42px;
-  }
-
-  h1 span:first-child {
-    font-size: clamp(38px, 12vw, 58px);
-  }
-
-  .hero-intro {
-    padding: 17px;
   }
 
   .lookup__controls {
@@ -641,11 +857,6 @@ footer a {
     grid-template-columns: repeat(4, auto);
     gap: 5px;
     justify-content: center;
-  }
-
-  .session-card__meta div {
-    grid-template-columns: 92px minmax(0, 1fr);
-    gap: 12px;
   }
 }
 

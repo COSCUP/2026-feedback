@@ -37,6 +37,7 @@ const previousSlot = document.querySelector("#previous-session");
 const lookup = document.querySelector("#session-lookup");
 const lookupForm = document.querySelector("#lookup-form");
 const sessionInput = document.querySelector("#session-id");
+const lookupButton = lookupForm.querySelector('button[type="submit"]');
 const cardTemplate = document.querySelector("#session-card-template");
 
 let sessions = [];
@@ -107,6 +108,7 @@ async function hydrateTrack(session) {
 async function showSession(sessionId) {
   const version = ++renderVersion;
   const currentSource = findSession(sessions, sessionId);
+  document.body.dataset.mode = currentSource ? "results" : "lookup";
   sessionInput.value = sessionId;
   lookup.hidden = false;
 
@@ -194,12 +196,15 @@ lookupForm.addEventListener("submit", (event) => {
 
 async function init() {
   const sessionId = sessionIdFromLocation(window.location);
+  document.body.dataset.mode = sessionId ? "results" : "lookup";
+  lookup.hidden = false;
+  lookupButton.disabled = true;
 
   try {
     sessions = await fetchSchedule(SCHEDULE_URL);
     if (!sessions.length) throw new Error("議程資料是空的");
 
-    lookup.hidden = false;
+    lookupButton.disabled = false;
     if (sessionId) {
       await showSession(sessionId);
     } else {
@@ -215,7 +220,6 @@ async function init() {
       sessionInput.focus();
     }
   } catch (error) {
-    lookup.hidden = false;
     const timeout = error?.name === "AbortError";
     setStatus(
       timeout
