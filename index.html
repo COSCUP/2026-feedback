@@ -3,38 +3,69 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#087a78" />
+    <meta name="theme-color" content="#20c779" />
     <meta
       name="description"
-      content="選擇 COSCUP 2026 目前或上一場議程，前往已預填議程資訊的回饋表單。"
+      content="選擇 COSCUP 2026 目前或上一場議程，核對講者與議程軌後前往回饋表單。"
     />
-    <title>COSCUP 2026 議程回饋</title>
+    <title>COSCUP 2026 議程回饋｜Session Feedback</title>
+    <link rel="icon" type="image/svg+xml" href="https://coscup.org/2026/favicon.svg" />
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
-    <div class="page-shell">
-      <header class="hero">
-        <a class="wordmark" href="https://coscup.org/2026/" rel="noreferrer">
-          <span class="wordmark__mark" aria-hidden="true">C</span>
-          <span>
-            <strong>COSCUP 2026</strong>
-            <small>Session Feedback</small>
-          </span>
-        </a>
+    <header class="site-header">
+      <a class="wordmark" href="https://coscup.org/2026/" rel="noreferrer">
+        <img
+          class="site-logo"
+          src="https://coscup.org/2026/_ipx/w_640&amp;f_webp/coscup_logo.png"
+          alt="COSCUP"
+        />
+        <span class="wordmark-kicker">2026</span>
+      </a>
+      <p class="header-title">
+        <strong lang="zh-Hant">議程回饋</strong>
+        <span lang="en">Session Feedback</span>
+        <span lang="ja">セッションフィードバック</span>
+        <span lang="ko">세션 피드백</span>
+      </p>
+    </header>
 
-        <div class="hero__copy">
-          <p class="eyebrow">讓每一次分享，長出下一次浪花</p>
-          <h1>你想回饋哪一場議程？</h1>
-          <p>
-            選擇目前或上一場議程，我們會帶你前往已填入議程名稱與議程軌的回饋表單。
-          </p>
+    <main>
+      <section class="hero-shell">
+        <figure class="hero-visual">
+          <img
+            src="./coscup-2026-transparent-banner.png"
+            alt="COSCUP 2026 與 UbuCon Asia 主視覺：臺灣島、海洋、夏日小吃與吉祥物"
+            fetchpriority="high"
+          />
+        </figure>
+
+        <div class="hero-copy">
+          <p class="eyebrow">COSCUP × UbuCon Asia 2026 · SESSION FEEDBACK</p>
+          <h1>
+            <span lang="zh-Hant">你想回饋哪一場議程？</span>
+            <span lang="en">Which session would you like to review?</span>
+            <span lang="ja">どのセッションにフィードバックしますか？</span>
+            <span lang="ko">어떤 세션에 피드백하시겠어요?</span>
+          </h1>
+          <div class="hero-intro">
+            <p lang="zh-Hant">請先核對議程名稱、講者與議程軌，再前往已預填資訊的回饋表單。</p>
+            <p lang="en">Check the session title, speaker, and track before opening the prefilled feedback form.</p>
+            <p lang="ja">セッション名・登壇者・トラックを確認してから、入力済みのフォームを開いてください。</p>
+            <p lang="ko">세션 제목, 발표자, 트랙을 확인한 뒤 미리 입력된 피드백 양식을 열어 주세요.</p>
+          </div>
         </div>
-      </header>
+      </section>
 
-      <main>
+      <div class="page-content">
         <section class="status-panel" aria-live="polite" aria-atomic="true">
           <span class="status-panel__dot" aria-hidden="true"></span>
-          <p id="status-message">正在讀取 COSCUP 2026 議程資料…</p>
+          <p id="status-message">
+            <span class="status-line" lang="zh-Hant">正在讀取 COSCUP 2026 議程資料…</span>
+            <span class="status-line" lang="en">Loading the COSCUP 2026 program…</span>
+            <span class="status-line" lang="ja">COSCUP 2026 のプログラムを読み込んでいます…</span>
+            <span class="status-line" lang="ko">COSCUP 2026 프로그램을 불러오는 중…</span>
+          </p>
         </section>
 
         <section id="session-results" class="session-grid" aria-label="可回饋的議程" hidden>
@@ -43,9 +74,19 @@
         </section>
 
         <section id="session-lookup" class="lookup" hidden>
-          <div>
-            <h2>改用議程 ID 查詢</h2>
-            <p>可貼上 OPass 或 COSCUP 議程頁所使用的 session ID。</p>
+          <div class="lookup__copy">
+            <h2>
+              <span lang="zh-Hant">改用議程 ID 查詢</span>
+              <span lang="en">Look up another session ID</span>
+              <span lang="ja">別のセッション ID を検索</span>
+              <span lang="ko">다른 세션 ID 검색</span>
+            </h2>
+            <p>
+              <span lang="zh-Hant">可貼上 OPass 或 COSCUP 議程頁所使用的 session ID。</span>
+              <span lang="en">Paste the session ID used by OPass or the COSCUP program page.</span>
+              <span lang="ja">OPass または COSCUP プログラムページのセッション ID を入力できます。</span>
+              <span lang="ko">OPass 또는 COSCUP 프로그램 페이지의 세션 ID를 입력할 수 있습니다.</span>
+            </p>
           </div>
           <form id="lookup-form" class="lookup__form">
             <label for="session-id">Session ID</label>
@@ -56,19 +97,26 @@
                 type="text"
                 autocomplete="off"
                 spellcheck="false"
-                placeholder="例如：ABC123"
+                placeholder="例如 / e.g. ABC123"
               />
-              <button type="submit">查詢議程</button>
+              <button type="submit">
+                <span lang="zh-Hant">查詢</span>
+                <span lang="en">Search</span>
+                <span lang="ja">検索</span>
+                <span lang="ko">검색</span>
+              </button>
             </div>
           </form>
         </section>
-      </main>
+      </div>
+    </main>
 
-      <footer>
-        <p>資料來源：COSCUP 2026 OPass API</p>
-        <a href="https://coscup.org/2026/" rel="noreferrer">返回 COSCUP 2026 官網</a>
-      </footer>
-    </div>
+    <footer>
+      <p>資料來源 · Data source · データソース · 데이터 출처：COSCUP 2026 OPass API</p>
+      <a href="https://coscup.org/2026/" rel="noreferrer">
+        COSCUP 2026 官網 · Website · 公式サイト · 공식 웹사이트 ↗
+      </a>
+    </footer>
 
     <template id="session-card-template">
       <a class="session-card">
@@ -76,21 +124,30 @@
         <h2 class="session-card__title"></h2>
         <dl class="session-card__meta">
           <div>
-            <dt>時間</dt>
+            <dt>時間<br /><span lang="en">Time</span> · <span lang="ja">時間</span> · <span lang="ko">시간</span></dt>
             <dd data-field="time"></dd>
           </div>
           <div>
-            <dt>場地</dt>
+            <dt>場地<br /><span lang="en">Room</span> · <span lang="ja">会場</span> · <span lang="ko">장소</span></dt>
             <dd data-field="room"></dd>
           </div>
+          <div class="session-card__speaker">
+            <dt>講者<br /><span lang="en">Speaker</span> · <span lang="ja">登壇者</span> · <span lang="ko">발표자</span></dt>
+            <dd data-field="speaker"></dd>
+          </div>
           <div>
-            <dt>議程軌</dt>
+            <dt>議程軌<br /><span lang="en">Track</span> · <span lang="ja">トラック</span> · <span lang="ko">트랙</span></dt>
             <dd data-field="track"></dd>
           </div>
         </dl>
         <span class="session-card__action">
-          前往填寫回饋
-          <span aria-hidden="true">↗</span>
+          <span>
+            <b lang="zh-Hant">前往填寫回饋</b>
+            <small lang="en">Open feedback form</small>
+            <small lang="ja">フィードバックを記入</small>
+            <small lang="ko">피드백 작성</small>
+          </span>
+          <i aria-hidden="true">↗</i>
         </span>
       </a>
     </template>

@@ -1,4 +1,5 @@
 export const SCHEDULE_URL = "https://coscup.org/2026/api/opass.json";
+export const SESSION_PAGE_ROOT = "https://coscup.org/2026/session/";
 
 export const FORM_CONFIG = Object.freeze({
   baseUrl:
@@ -112,11 +113,10 @@ function resolveTrackName(session, tagsIndex, sessionTypesIndex) {
     if (resolved) return resolved;
   }
 
-  const tagNames = asArray(session.tags ?? session.tag)
-    .map((tag) => resolveName(tag, tagsIndex, "name"))
-    .filter(Boolean);
-
-  return tagNames[0] || "未標示議程軌";
+  // OPass `tags` currently contains language and difficulty labels, not the
+  // program track. The authoritative track is hydrated from the public
+  // session detail page instead of guessing from the first tag.
+  return "";
 }
 
 export function normalizeSchedule(rawData) {
@@ -125,6 +125,7 @@ export function normalizeSchedule(rawData) {
   const roomsIndex = collectionIndex(data?.rooms ?? data?.room);
   const tagsIndex = collectionIndex(data?.tags ?? data?.tracks ?? data?.communities);
   const sessionTypesIndex = collectionIndex(data?.session_types ?? data?.sessionTypes);
+  const speakersIndex = collectionIndex(data?.speakers ?? data?.speaker);
 
   return sessions
     .map((session, sourceIndex) => {
@@ -151,6 +152,9 @@ export function normalizeSchedule(rawData) {
         firstValue(session.start, session.start_at, session.startAt, session.begin),
       );
       const endAt = toEpoch(firstValue(session.end, session.end_at, session.endAt, session.finish));
+      const speakerNames = asArray(session.speakers ?? session.speaker)
+        .map((speaker) => resolveName(speaker, speakersIndex, "name"))
+        .filter(Boolean);
 
       return {
         id,
@@ -160,6 +164,7 @@ export function normalizeSchedule(rawData) {
           localizedText(session.title, "title") ||
           "未命名議程",
         trackName: resolveTrackName(session, tagsIndex, sessionTypesIndex),
+        speakerNames,
         roomId,
         roomName,
         startAt,
@@ -216,8 +221,66 @@ export function buildFeedbackUrl(session, config = FORM_CONFIG) {
   const url = new URL(config.baseUrl);
   url.searchParams.set("usp", "pp_url");
   url.searchParams.set(config.titleEntry, session.title);
-  url.searchParams.set(config.trackEntry, session.trackName);
+  if (session.trackName) url.searchParams.set(config.trackEntry, session.trackName);
   return url.toString();
+}
+
+function decodeHtmlText(value) {
+  const namedEntities = {
+    amp: "&",
+    apos: "'",
+    gt: ">",
+    lt: "<",
+    nbsp: " ",
+    quot: '"',
+  };
+
+  return value
+    .replace(/<[^>]*>/g, " ")
+    .replace(/&(#(?:x[0-9a-f]+|\d+)|[a-z]+);/gi, (match, entity) => {
+      if (entity[0] !== "#") return namedEntities[entity.toLowerCase()] ?? match;
+      const hexadecimal = entity[1]?.toLowerCase() === "x";
+      const codePoint = Number.parseInt(entity.slice(hexadecimal ? 2 : 1), hexadecimal ? 16 : 10);
+      return Number.isFinite(codePoint) ? String.fromCodePoint(codePoint) : match;
+    })
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+export function trackNameFromSessionHtml(html) {
+  if (typeof html !== "string") return "";
+  const match = html.match(
+    /<a\b[^>]*href=["'][^"']*\/2026\/(?:[a-z]{2}(?:-[a-z]+)?\/)?track\/[^"']+["'][^>]*>([\s\S]*?)<\/a>/i,
+  );
+  return match ? decodeHtmlText(match[1].replace(/<span\b[\s\S]*?<\/span>/gi, " ")) : "";
+}
+
+export async function fetchTrackName(
+  session,
+  {
+    fetchImpl = fetch,
+    timeoutMs = 12_000,
+    sessionPageRoot = SESSION_PAGE_ROOT,
+  } = {},
+) {
+  if (session?.trackName) return session.trackName;
+  if (!session?.id) return "";
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+  const url = new URL(`${encodeURIComponent(session.id)}/`, sessionPageRoot);
+
+  try {
+    const response = await fetchImpl(url, {
+      headers: { Accept: "text/html" },
+      cache: "no-store",
+      signal: controller.signal,
+    });
+    if (!response.ok) throw new Error(`讀取議程軌失敗（HTTP ${response.status}）`);
+    return trackNameFromSessionHtml(await response.text());
+  } finally {
+    clearTimeout(timeout);
+  }
 }
 
 export function sessionIdFromLocation(locationLike) {
@@ -255,13 +318,13 @@ export async function fetchSchedule(
 export function formatSessionTime(session) {
   if (!Number.isFinite(session.startAt)) return "時間未定";
 
-  const date = new Intl.DateTimeFormat("zh-TW", {
+  const date = new Intl.DateTimeFormat("en-CA", {
     timeZone: TAIPEI_TIME_ZONE,
+    year: "numeric",
     month: "numeric",
     day: "numeric",
-    weekday: "short",
   }).format(session.startAt);
-  const timeFormatter = new Intl.DateTimeFormat("zh-TW", {
+  const timeFormatter = new Intl.DateTimeFormat("en-GB", {
     timeZone: TAIPEI_TIME_ZONE,
     hour: "2-digit",
     minute: "2-digit",
@@ -269,5 +332,5 @@ export function formatSessionTime(session) {
   });
   const start = timeFormatter.format(session.startAt);
   const end = Number.isFinite(session.endAt) ? timeFormatter.format(session.endAt) : "";
-  return `${date} ${start}${end ? `–${end}` : ""}`;
+  return `${date} ${start}${end ? `–${end}` : ""} (UTC+8)`;
 }
