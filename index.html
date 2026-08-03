@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#087a78" />
+    <meta
+      name="description"
+      content="選擇 COSCUP 2026 目前或上一場議程，前往已預填議程資訊的回饋表單。"
+    />
+    <title>COSCUP 2026 議程回饋</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="hero">
+        <a class="wordmark" href="https://coscup.org/2026/" rel="noreferrer">
+          <span class="wordmark__mark" aria-hidden="true">C</span>
+          <span>
+            <strong>COSCUP 2026</strong>
+            <small>Session Feedback</small>
+          </span>
+        </a>
+
+        <div class="hero__copy">
+          <p class="eyebrow">讓每一次分享，長出下一次浪花</p>
+          <h1>你想回饋哪一場議程？</h1>
+          <p>
+            選擇目前或上一場議程，我們會帶你前往已填入議程名稱與議程軌的回饋表單。
+          </p>
+        </div>
+      </header>
+
+      <main>
+        <section class="status-panel" aria-live="polite" aria-atomic="true">
+          <span class="status-panel__dot" aria-hidden="true"></span>
+          <p id="status-message">正在讀取 COSCUP 2026 議程資料…</p>
+        </section>
+
+        <section id="session-results" class="session-grid" aria-label="可回饋的議程" hidden>
+          <article id="current-session" class="session-slot"></article>
+          <article id="previous-session" class="session-slot"></article>
+        </section>
+
+        <section id="session-lookup" class="lookup" hidden>
+          <div>
+            <h2>改用議程 ID 查詢</h2>
+            <p>可貼上 OPass 或 COSCUP 議程頁所使用的 session ID。</p>
+          </div>
+          <form id="lookup-form" class="lookup__form">
+            <label for="session-id">Session ID</label>
+            <div class="lookup__controls">
+              <input
+                id="session-id"
+                name="session"
+                type="text"
+                autocomplete="off"
+                spellcheck="false"
+                placeholder="例如：ABC123"
+              />
+              <button type="submit">查詢議程</button>
+            </div>
+          </form>
+        </section>
+      </main>
+
+      <footer>
+        <p>資料來源：COSCUP 2026 OPass API</p>
+        <a href="https://coscup.org/2026/" rel="noreferrer">返回 COSCUP 2026 官網</a>
+      </footer>
+    </div>
+
+    <template id="session-card-template">
+      <a class="session-card">
+        <span class="session-card__label"></span>
+        <h2 class="session-card__title"></h2>
+        <dl class="session-card__meta">
+          <div>
+            <dt>時間</dt>
+            <dd data-field="time"></dd>
+          </div>
+          <div>
+            <dt>場地</dt>
+            <dd data-field="room"></dd>
+          </div>
+          <div>
+            <dt>議程軌</dt>
+            <dd data-field="track"></dd>
+          </div>
+        </dl>
+        <span class="session-card__action">
+          前往填寫回饋
+          <span aria-hidden="true">↗</span>
+        </span>
+      </a>
+    </template>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
