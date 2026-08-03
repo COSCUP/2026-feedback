@@ -10,7 +10,7 @@
     />
     <title>COSCUP 2026 議程回饋｜Session Feedback</title>
     <link rel="icon" type="image/svg+xml" href="https://coscup.org/2026/favicon.svg" />
-    <link rel="stylesheet" href="./styles.css?v=20260804-focus-2" />
+    <link rel="stylesheet" href="./styles.css?v=20260804-focus-3" />
   </head>
   <body>
     <header class="site-header">
@@ -60,44 +60,6 @@
           </p>
         </section>
 
-        <section id="session-results" class="session-grid" aria-label="可回饋的議程" hidden>
-          <div
-            class="session-switcher"
-            role="group"
-            aria-label="議程切換 / Session switcher / セッション切り替え / 세션 전환"
-            hidden
-          >
-            <button
-              id="show-current-session"
-              class="session-switcher__button session-switcher__button--current"
-              type="button"
-              aria-controls="current-session"
-              aria-pressed="true"
-              data-session-target="current"
-            >
-              <span lang="zh-Hant">當場議程</span>
-              <span lang="en">Current session</span>
-              <span lang="ja">現在のセッション</span>
-              <span lang="ko">현재 세션</span>
-            </button>
-            <button
-              id="show-previous-session"
-              class="session-switcher__button session-switcher__button--previous"
-              type="button"
-              aria-controls="previous-session"
-              aria-pressed="false"
-              data-session-target="previous"
-            >
-              <span lang="zh-Hant">前一場議程</span>
-              <span lang="en">Previous session</span>
-              <span lang="ja">前のセッション</span>
-              <span lang="ko">이전 세션</span>
-            </button>
-          </div>
-          <article id="current-session" class="session-slot"></article>
-          <article id="previous-session" class="session-slot" hidden></article>
-        </section>
-
         <section id="session-lookup" class="lookup" hidden>
           <div class="lookup__copy">
             <h2>
@@ -126,6 +88,33 @@
               </button>
             </div>
           </form>
+        </section>
+
+        <section id="session-results" class="session-grid" aria-label="可回饋的議程" hidden>
+          <nav
+            class="session-navigator"
+            aria-label="議程切換 / Session navigation / セッション移動 / 세션 이동"
+          >
+            <button id="show-previous-session" type="button" aria-controls="selected-session">
+              <i aria-hidden="true">←</i>
+              <span>
+                <b lang="zh-Hant">前一場</b>
+                <small lang="en">Previous</small>
+                <small lang="ja">前のセッション</small>
+                <small lang="ko">이전 세션</small>
+              </span>
+            </button>
+            <button id="show-next-session" type="button" aria-controls="selected-session">
+              <span>
+                <b lang="zh-Hant">後一場</b>
+                <small lang="en">Next</small>
+                <small lang="ja">次のセッション</small>
+                <small lang="ko">다음 세션</small>
+              </span>
+              <i aria-hidden="true">→</i>
+            </button>
+          </nav>
+          <article id="selected-session" class="session-slot" aria-live="polite"></article>
         </section>
       </div>
     </main>
@@ -161,16 +150,16 @@
         </dl>
         <span class="session-card__action">
           <span>
-            <b lang="zh-Hant">前往填寫回饋</b>
-            <small lang="en">Open feedback form</small>
-            <small lang="ja">フィードバックを記入</small>
-            <small lang="ko">피드백 작성</small>
+            <b lang="zh-Hant">填寫這場議程的回饋</b>
+            <small lang="en">Give feedback for this session</small>
+            <small lang="ja">このセッションにフィードバック</small>
+            <small lang="ko">이 세션에 피드백 남기기</small>
           </span>
           <i aria-hidden="true">↗</i>
         </span>
       </a>
     </template>
 
-    <script type="module" src="./app.js?v=20260804-focus-2"></script>
+    <script type="module" src="./app.js?v=20260804-focus-3"></script>
   </body>
 </html>

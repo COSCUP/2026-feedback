@@ -217,6 +217,41 @@ export function findPreviousSession(sessions, currentSession) {
   );
 }
 
+export function findNextSession(sessions, currentSession) {
+  if (!currentSession) return null;
+
+  const sameRoom = (session) => {
+    if (currentSession.roomId && session.roomId) return session.roomId === currentSession.roomId;
+    return session.roomName === currentSession.roomName;
+  };
+
+  if (Number.isFinite(currentSession.startAt)) {
+    return (
+      sessions
+        .filter(
+          (session) =>
+            session.id !== currentSession.id &&
+            sameRoom(session) &&
+            session.dateKey === currentSession.dateKey &&
+            Number.isFinite(session.startAt) &&
+            session.startAt > currentSession.startAt,
+        )
+        .sort((a, b) => a.startAt - b.startAt)[0] ?? null
+    );
+  }
+
+  return (
+    sessions
+      .filter(
+        (session) =>
+          session.id !== currentSession.id &&
+          sameRoom(session) &&
+          session.sourceIndex > currentSession.sourceIndex,
+      )
+      .sort((a, b) => a.sourceIndex - b.sourceIndex)[0] ?? null
+  );
+}
+
 export function buildFeedbackUrl(session, config = FORM_CONFIG) {
   const url = new URL(config.baseUrl);
   url.searchParams.set("usp", "pp_url");

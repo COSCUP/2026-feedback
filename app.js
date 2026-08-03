@@ -3,6 +3,7 @@ import {
   buildFeedbackUrl,
   fetchSchedule,
   fetchTrackName,
+  findNextSession,
   findPreviousSession,
   findSession,
   formatSessionTime,
@@ -14,7 +15,13 @@ const LANGS = ["zh-Hant", "en", "ja", "ko"];
 const copy = {
   current: ["當場議程", "Current session", "現在のセッション", "현재 세션"],
   previous: ["前一場議程", "Previous session", "前のセッション", "이전 세션"],
-  openForm: ["前往填寫回饋", "Open feedback form", "フィードバックを記入", "피드백 작성"],
+  next: ["後一場議程", "Next session", "次のセッション", "다음 세션"],
+  openForm: [
+    "填寫這場議程的回饋",
+    "Give feedback for this session",
+    "このセッションにフィードバック",
+    "이 세션에 피드백 남기기",
+  ],
   trackUnavailable: [
     "議程軌暫時無法載入（表單不會誤填語言）",
     "Track unavailable (language will not be used by mistake)",
@@ -26,11 +33,9 @@ const copy = {
 const statusPanel = document.querySelector(".status-panel");
 const statusMessage = document.querySelector("#status-message");
 const sessionResults = document.querySelector("#session-results");
-const sessionSwitcher = document.querySelector(".session-switcher");
-const currentSwitch = document.querySelector('[data-session-target="current"]');
-const previousSwitch = document.querySelector('[data-session-target="previous"]');
-const currentSlot = document.querySelector("#current-session");
-const previousSlot = document.querySelector("#previous-session");
+const previousButton = document.querySelector("#show-previous-session");
+const nextButton = document.querySelector("#show-next-session");
+const selectedSlot = document.querySelector("#selected-session");
 const lookup = document.querySelector("#session-lookup");
 const lookupForm = document.querySelector("#lookup-form");
 const sessionInput = document.querySelector("#session-id");
@@ -39,6 +44,7 @@ const cardTemplate = document.querySelector("#session-card-template");
 
 let sessions = [];
 let renderVersion = 0;
+let anchorSession = null;
 
 function addLanguageLines(container, lines, className = "language-line") {
   container.replaceChildren();
@@ -57,9 +63,10 @@ function setStatus(lines, state = "loading") {
   statusPanel.dataset.state = state;
 }
 
-function renderSessionCard(slot, session, labels) {
+function renderSessionCard(slot, session, labels, isCurrent) {
   slot.replaceChildren();
   const card = cardTemplate.content.firstElementChild.cloneNode(true);
+  card.classList.toggle("is-current", isCurrent);
   card.href = buildFeedbackUrl(session);
   card.target = "_blank";
   card.rel = "noreferrer";
@@ -84,12 +91,19 @@ function renderSessionCard(slot, session, labels) {
   slot.append(card);
 }
 
-function selectSessionSlot(target) {
-  const showCurrent = target === "current";
-  currentSlot.hidden = !showCurrent;
-  previousSlot.hidden = showCurrent;
-  currentSwitch.setAttribute("aria-pressed", String(showCurrent));
-  previousSwitch.setAttribute("aria-pressed", String(!showCurrent));
+function sessionLabels(session) {
+  if (!anchorSession || session.id === anchorSession.id) return copy.current;
+  if (session.startAt < anchorSession.startAt) return copy.previous;
+  return copy.next;
+}
+
+function updateNavigation(session) {
+  const previous = findPreviousSession(sessions, session);
+  const next = findNextSession(sessions, session);
+  previousButton.disabled = !previous;
+  nextButton.disabled = !next;
+  previousButton.dataset.sessionId = previous?.id ?? "";
+  nextButton.dataset.sessionId = next?.id ?? "";
 }
 
 async function hydrateTrack(session) {
@@ -103,14 +117,52 @@ async function hydrateTrack(session) {
   }
 }
 
-async function showSession(sessionId) {
+async function displaySession(source) {
   const version = ++renderVersion;
+  previousButton.disabled = true;
+  nextButton.disabled = true;
+  setStatus([
+    "正在向官方議程頁核對議程軌…",
+    "Checking the track against the official program…",
+    "公式プログラムでトラックを確認しています…",
+    "공식 프로그램에서 트랙을 확인하고 있습니다…",
+  ]);
+
+  const session = await hydrateTrack(source);
+  if (version !== renderVersion) return;
+
+  renderSessionCard(
+    selectedSlot,
+    session,
+    sessionLabels(session),
+    session.id === anchorSession.id,
+  );
+  updateNavigation(source);
+  sessionResults.hidden = false;
+  if (!session.trackName) {
+    setStatus(
+      [
+        "議程已載入；議程軌無法取得，表單將保留空白供確認。",
+        "Session loaded; the unavailable track is left blank for confirmation.",
+        "セッションを読み込みました。取得できないトラックは確認用に空欄にします。",
+        "세션을 불러왔습니다. 확인할 수 없는 트랙은 빈칸으로 둡니다.",
+      ],
+      "error",
+    );
+  } else {
+    statusPanel.hidden = true;
+  }
+}
+
+async function showSession(sessionId) {
   const currentSource = findSession(sessions, sessionId);
   document.body.dataset.mode = currentSource ? "results" : "lookup";
   sessionInput.value = sessionId;
   lookup.hidden = false;
 
   if (!currentSource) {
+    ++renderVersion;
+    anchorSession = null;
     sessionResults.hidden = true;
     setStatus(
       [
@@ -124,50 +176,17 @@ async function showSession(sessionId) {
     return;
   }
 
-  setStatus([
-    "正在向官方議程頁核對議程軌…",
-    "Checking the track against the official program…",
-    "公式プログラムでトラックを確認しています…",
-    "공식 프로그램에서 트랙을 확인하고 있습니다…",
-  ]);
-
-  const previousSource = findPreviousSession(sessions, currentSource);
-  const [current, previous] = await Promise.all([
-    hydrateTrack(currentSource),
-    hydrateTrack(previousSource),
-  ]);
-  if (version !== renderVersion) return;
-
-  renderSessionCard(currentSlot, current, copy.current);
-  if (previous) {
-    renderSessionCard(previousSlot, previous, copy.previous);
-    sessionSwitcher.hidden = false;
-    selectSessionSlot("current");
-  } else {
-    previousSlot.replaceChildren();
-    sessionSwitcher.hidden = true;
-    selectSessionSlot("current");
-  }
-
-  sessionResults.hidden = false;
-  const hasMissingTrack = !current.trackName || (previous && !previous.trackName);
-  if (hasMissingTrack) {
-    setStatus(
-      [
-        "議程已載入；部分議程軌無法取得，表單將保留空白供確認。",
-        "Sessions loaded; unavailable tracks are left blank for confirmation.",
-        "セッションを読み込みました。取得できないトラックは確認用に空欄にします。",
-        "세션을 불러왔습니다. 확인할 수 없는 트랙은 빈칸으로 둡니다.",
-      ],
-      "error",
-    );
-  } else {
-    statusPanel.hidden = true;
-  }
+  anchorSession = currentSource;
+  await displaySession(currentSource);
 }
 
-currentSwitch.addEventListener("click", () => selectSessionSlot("current"));
-previousSwitch.addEventListener("click", () => selectSessionSlot("previous"));
+function navigateFrom(button) {
+  const target = findSession(sessions, button.dataset.sessionId);
+  if (target) void displaySession(target);
+}
+
+previousButton.addEventListener("click", () => navigateFrom(previousButton));
+nextButton.addEventListener("click", () => navigateFrom(nextButton));
 
 function updateSessionInUrl(sessionId) {
   const url = new URL(window.location.href);

@@ -4,6 +4,7 @@ import test from "node:test";
 import {
   buildFeedbackUrl,
   fetchTrackName,
+  findNextSession,
   findPreviousSession,
   findSession,
   normalizeSchedule,
@@ -44,6 +45,15 @@ const fixture = {
       end: "2026-08-08T11:15:00+08:00",
     },
     {
+      id: "NEXT",
+      zh: { title: "下一場議程", description: "" },
+      room: "R1",
+      tags: ["language_zhtw"],
+      speakers: ["SPEAKER_B"],
+      start: "2026-08-08T11:30:00+08:00",
+      end: "2026-08-08T12:00:00+08:00",
+    },
+    {
       id: "OTHER_ROOM",
       zh: { title: "另一間教室", description: "" },
       room: "R2",
@@ -76,7 +86,17 @@ test("normalizes OPass session, room and speaker data without treating language 
 test("finds the closest earlier session in the same room and day", () => {
   const sessions = normalizeSchedule(fixture);
   const current = findSession(sessions, "CURRENT");
-  assert.equal(findPreviousSession(sessions, current)?.id, "PREVIOUS");
+  const previous = findPreviousSession(sessions, current);
+  assert.equal(previous?.id, "PREVIOUS");
+  assert.equal(findPreviousSession(sessions, previous), null);
+});
+
+test("finds the closest later session in the same room and day", () => {
+  const sessions = normalizeSchedule(fixture);
+  const current = findSession(sessions, "CURRENT");
+  const next = findNextSession(sessions, current);
+  assert.equal(next?.id, "NEXT");
+  assert.equal(findNextSession(sessions, next), null);
 });
 
 test("builds a Google Forms prefilled URL", () => {

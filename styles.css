@@ -209,6 +209,11 @@ body[data-mode="lookup"] .lookup {
   margin-bottom: 24px;
 }
 
+body[data-mode="results"] .lookup {
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+
 .status-panel {
   display: grid;
   align-items: start;
@@ -274,51 +279,71 @@ body[data-mode="lookup"] .lookup {
   gap: 16px;
 }
 
-.session-switcher {
+.session-navigator {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
 }
 
-.session-switcher__button {
-  display: grid;
+.session-navigator button {
+  display: flex;
   min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   padding: 11px 14px;
   border: 2px solid var(--ink);
   border-radius: 15px;
+  background: var(--white);
   box-shadow: 2px 3px 0 var(--ink);
   color: var(--ink);
   cursor: pointer;
   font: inherit;
-  font-size: 10px;
   font-weight: 900;
-  line-height: 1.3;
   text-align: left;
   transition: box-shadow 150ms ease, translate 150ms ease;
 }
 
-.session-switcher__button--current {
-  background: var(--coral);
-  color: white;
+.session-navigator button:last-child {
+  text-align: right;
 }
 
-.session-switcher__button--previous {
-  background: var(--white);
+.session-navigator button > span {
+  display: grid;
+  min-width: 0;
+  gap: 1px;
 }
 
-.session-switcher__button[aria-pressed="true"] {
-  box-shadow: 5px 6px 0 var(--ink);
+.session-navigator b {
+  font-size: 15px;
+  line-height: 1.2;
+}
+
+.session-navigator small {
+  font-size: 8px;
+  line-height: 1.25;
+}
+
+.session-navigator i {
+  flex: none;
+  font-size: 22px;
+  font-style: normal;
+}
+
+.session-navigator button:hover:not(:disabled) {
+  box-shadow: 4px 5px 0 var(--ink);
   translate: 0 -2px;
 }
 
-.session-switcher__button:hover,
-.session-switcher__button:focus-visible {
+.session-navigator button:focus-visible {
   outline: 3px solid var(--ink);
   outline-offset: 2px;
 }
 
-.session-switcher__button span {
-  display: block;
+.session-navigator button:disabled {
+  box-shadow: none;
+  cursor: not-allowed;
+  opacity: 0.35;
 }
 
 .session-slot {
@@ -338,8 +363,8 @@ body[data-mode="lookup"] .lookup {
   transition: translate 160ms ease, box-shadow 160ms ease;
 }
 
-#previous-session .session-card {
-  background: var(--white);
+.session-card.is-current {
+  background: #fff8dc;
 }
 
 .session-card:hover,
@@ -354,15 +379,15 @@ body[data-mode="lookup"] .lookup {
   padding: 8px 12px;
   border: 2px solid var(--ink);
   border-radius: 14px;
-  background: var(--coral);
-  color: white;
+  background: var(--white);
+  color: var(--ink);
   font-size: 11px;
   font-weight: 900;
   line-height: 1.25;
 }
 
-#previous-session .session-card__label {
-  background: var(--white);
+.session-card.is-current .session-card__label {
+  background: var(--yellow);
   color: var(--ink);
 }
 
@@ -422,8 +447,12 @@ body[data-mode="lookup"] .lookup {
   justify-content: space-between;
   gap: 16px;
   margin-top: auto;
-  padding-top: 8px;
-  color: var(--sea-dark);
+  padding: 12px 14px;
+  border: 2px solid var(--ink);
+  border-radius: 15px;
+  background: var(--coral);
+  box-shadow: 3px 4px 0 var(--ink);
+  color: white;
 }
 
 .session-card__action > span {
@@ -432,7 +461,7 @@ body[data-mode="lookup"] .lookup {
 }
 
 .session-card__action b {
-  font-size: 17px;
+  font-size: 19px;
 }
 
 .session-card__action small {
@@ -448,25 +477,10 @@ body[data-mode="lookup"] .lookup {
   place-items: center;
   border: 2px solid var(--ink);
   border-radius: 50%;
-  background: var(--cyan);
+  background: var(--white);
   color: var(--ink);
   font-size: 22px;
   font-style: normal;
-}
-
-.empty-card {
-  display: grid;
-  min-height: 320px;
-  place-content: center;
-  padding: 32px;
-  border: 3px dashed var(--ink);
-  border-radius: 24px;
-  background: #eefaf4;
-  color: var(--muted);
-  font-size: 13px;
-  font-weight: 750;
-  line-height: 1.5;
-  text-align: center;
 }
 
 .lookup {
@@ -673,20 +687,26 @@ footer a {
     gap: 12px;
   }
 
-  .session-switcher {
+  .session-navigator {
     gap: 8px;
   }
 
-  .session-switcher__button {
+  .session-navigator button {
     padding: 7px 9px;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1px 7px;
+    gap: 7px;
     border-radius: 11px;
-    font-size: 8px;
   }
 
-  .session-switcher__button[aria-pressed="true"] {
-    box-shadow: 4px 4px 0 var(--ink);
+  .session-navigator b {
+    font-size: 12px;
+  }
+
+  .session-navigator small {
+    font-size: 6.5px;
+  }
+
+  .session-navigator i {
+    font-size: 17px;
   }
 
   .page-content {
@@ -764,11 +784,14 @@ footer a {
 
   .session-card__action {
     gap: 10px;
-    padding-top: 2px;
+    padding: 8px 9px;
+    border-width: 1.5px;
+    border-radius: 11px;
+    box-shadow: 2px 3px 0 var(--ink);
   }
 
   .session-card__action b {
-    font-size: 13px;
+    font-size: 14px;
   }
 
   .session-card__action small {
@@ -780,14 +803,6 @@ footer a {
     height: 34px;
     border-width: 1.5px;
     font-size: 17px;
-  }
-
-  .empty-card {
-    min-height: 130px;
-    padding: 18px;
-    border-width: 2px;
-    border-radius: 16px;
-    font-size: 9px;
   }
 
   .lookup {
