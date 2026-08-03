@@ -8,7 +8,7 @@ import {
   findSession,
   formatSessionTime,
   sessionIdFromLocation,
-} from "./schedule.js?v=20260804-focus-4";
+} from "./schedule.js?v=20260804-focus-5";
 
 const LANGS = ["zh-Hant", "en", "ja", "ko"];
 
@@ -34,6 +34,7 @@ const statusPanel = document.querySelector(".status-panel");
 const statusMessage = document.querySelector("#status-message");
 const sessionResults = document.querySelector("#session-results");
 const previousButton = document.querySelector("#show-previous-session");
+const currentButton = document.querySelector("#show-current-session");
 const nextButton = document.querySelector("#show-next-session");
 const selectedSlot = document.querySelector("#selected-session");
 const lookup = document.querySelector("#session-lookup");
@@ -101,6 +102,7 @@ function updateNavigation(session) {
   const previous = findPreviousSession(sessions, session);
   const next = findNextSession(sessions, session);
   previousButton.disabled = !previous;
+  currentButton.disabled = session.id === anchorSession?.id;
   nextButton.disabled = !next;
   previousButton.dataset.sessionId = previous?.id ?? "";
   nextButton.dataset.sessionId = next?.id ?? "";
@@ -120,6 +122,7 @@ async function hydrateTrack(session) {
 async function displaySession(source) {
   const version = ++renderVersion;
   previousButton.disabled = true;
+  currentButton.disabled = true;
   nextButton.disabled = true;
   setStatus([
     "正在向官方議程頁核對議程軌…",
@@ -158,7 +161,7 @@ async function showSession(sessionId) {
   const currentSource = findSession(sessions, sessionId);
   document.body.dataset.mode = currentSource ? "results" : "lookup";
   sessionInput.value = sessionId;
-  lookup.hidden = false;
+  lookup.hidden = Boolean(currentSource);
 
   if (!currentSource) {
     ++renderVersion;
@@ -186,6 +189,9 @@ function navigateFrom(button) {
 }
 
 previousButton.addEventListener("click", () => navigateFrom(previousButton));
+currentButton.addEventListener("click", () => {
+  if (anchorSession) void displaySession(anchorSession);
+});
 nextButton.addEventListener("click", () => navigateFrom(nextButton));
 
 function updateSessionInUrl(sessionId) {
@@ -221,7 +227,7 @@ lookupForm.addEventListener("submit", (event) => {
 async function init() {
   const sessionId = sessionIdFromLocation(window.location);
   document.body.dataset.mode = sessionId ? "results" : "lookup";
-  lookup.hidden = false;
+  lookup.hidden = Boolean(sessionId);
   lookupButton.disabled = true;
 
   try {

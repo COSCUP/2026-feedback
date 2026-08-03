@@ -10,7 +10,7 @@
     />
     <title>COSCUP 2026 議程回饋｜Session Feedback</title>
     <link rel="icon" type="image/svg+xml" href="https://coscup.org/2026/favicon.svg" />
-    <link rel="stylesheet" href="./styles.css?v=20260804-focus-4" />
+    <link rel="stylesheet" href="./styles.css?v=20260804-focus-5" />
   </head>
   <body>
     <header class="site-header">
@@ -104,6 +104,20 @@
                 <small lang="ko">이전 세션</small>
               </span>
             </button>
+            <button
+              id="show-current-session"
+              class="session-navigator__current"
+              type="button"
+              aria-controls="selected-session"
+              disabled
+            >
+              <span>
+                <b lang="zh-Hant">回到當下議程</b>
+                <small lang="en">Current session</small>
+                <small lang="ja">現在のセッションへ戻る</small>
+                <small lang="ko">현재 세션으로 돌아가기</small>
+              </span>
+            </button>
             <button id="show-next-session" type="button" aria-controls="selected-session">
               <span>
                 <b lang="zh-Hant">後一場</b>
@@ -160,6 +174,6 @@
       </a>
     </template>
 
-    <script type="module" src="./app.js?v=20260804-focus-4"></script>
+    <script type="module" src="./app.js?v=20260804-focus-5"></script>
   </body>
 </html>
