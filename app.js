@@ -8,7 +8,7 @@ import {
   findSession,
   formatSessionTime,
   sessionIdFromLocation,
-} from "./schedule.js";
+} from "./schedule.js?v=20260804-focus-4";
 
 const LANGS = ["zh-Hant", "en", "ja", "ko"];
 
