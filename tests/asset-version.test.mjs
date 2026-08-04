@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-const ASSET_VERSION = "20260804-focus-7";
+const ASSET_VERSION = "20260804-focus-8";
 
 test("uses one cache-busting version across page and module assets", async () => {
   const [html, app] = await Promise.all([
