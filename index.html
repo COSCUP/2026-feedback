@@ -10,25 +10,31 @@
     />
     <title>COSCUP 2026 議程回饋｜Session Feedback</title>
     <link rel="icon" type="image/svg+xml" href="https://coscup.org/2026/favicon.svg" />
-    <link rel="stylesheet" href="./styles.css?v=20260804-focus-5" />
+    <link rel="stylesheet" href="./styles.css?v=20260804-focus-7" />
   </head>
   <body>
-    <header class="site-header">
+    <nav
+      class="site-header"
+      aria-label="COSCUP 網站導覽 / COSCUP site navigation / COSCUP サイトナビゲーション / COSCUP 사이트 탐색"
+    >
       <a class="wordmark" href="https://coscup.org/2026/" rel="noreferrer">
         <img
           class="site-logo"
-          src="https://coscup.org/2026/_ipx/w_640&amp;f_webp/coscup_logo.png"
-          alt="COSCUP"
+          src="https://coscup.org/2026/_ipx/w_640&amp;f_webp/coscup_logo_white.png"
+          alt="COSCUP x UbuCon Asia 2026"
         />
-        <span class="wordmark-kicker">2026</span>
       </a>
-      <p class="header-title">
-        <strong lang="zh-Hant">議程回饋</strong>
-        <span lang="en">Session Feedback</span>
-        <span lang="ja">セッションフィードバック</span>
-        <span lang="ko">세션 피드백</span>
-      </p>
-    </header>
+      <div class="site-navigation">
+        <a href="https://coscup.org/2026/" rel="noreferrer">首頁</a>
+        <a class="site-navigation__schedule" href="https://coscup.org/2026/session" rel="noreferrer">議程</a>
+        <a href="https://coscup.org/2026/venue" rel="noreferrer">會場地圖</a>
+        <a class="site-navigation__current" href="./" aria-current="page">議程回饋</a>
+      </div>
+      <a class="header-language" href="https://coscup.org/2026/en" rel="noreferrer">
+        <span aria-hidden="true">◎</span>
+        English
+      </a>
+    </nav>
 
     <main>
       <section class="hero-shell">
@@ -174,6 +180,6 @@
       </a>
     </template>
 
-    <script type="module" src="./app.js?v=20260804-focus-5"></script>
+    <script type="module" src="./app.js?v=20260804-focus-7"></script>
   </body>
 </html>

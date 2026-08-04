@@ -8,14 +8,14 @@ import {
   findSession,
   formatSessionTime,
   sessionIdFromLocation,
-} from "./schedule.js?v=20260804-focus-5";
+} from "./schedule.js?v=20260804-focus-7";
 
 const LANGS = ["zh-Hant", "en", "ja", "ko"];
 
 const copy = {
-  current: ["當場議程", "Current session", "現在のセッション", "현재 세션"],
-  previous: ["前一場議程", "Previous session", "前のセッション", "이전 세션"],
-  next: ["後一場議程", "Next session", "次のセッション", "다음 세션"],
+  current: ["當下議程", "Current session", "現在のセッション", "현재 세션"],
+  previous: ["已過議程", "Previous session", "終了したセッション", "종료된 세션"],
+  next: ["尚未開始", "Next session", "開始前のセッション", "시작 전 세션"],
   openForm: [
     "填寫這場議程的回饋",
     "Give feedback for this session",
@@ -28,6 +28,12 @@ const copy = {
     "トラックを取得できません（言語を誤入力しません）",
     "트랙을 불러올 수 없음 (언어를 잘못 입력하지 않음)",
   ],
+};
+
+const sessionStatuses = {
+  current: { key: "current", tag: "Now Online", labels: copy.current },
+  previous: { key: "previous", tag: "Ended", labels: copy.previous },
+  next: { key: "next", tag: "Upcoming", labels: copy.next },
 };
 
 const statusPanel = document.querySelector(".status-panel");
@@ -64,18 +70,36 @@ function setStatus(lines, state = "loading") {
   statusPanel.dataset.state = state;
 }
 
-function renderSessionCard(slot, session, labels, isCurrent) {
+function addSessionStatus(container, status) {
+  container.replaceChildren();
+  const tag = document.createElement("span");
+  tag.className = "session-card__status-tag";
+  tag.lang = "en";
+  tag.textContent = status.tag;
+  container.append(tag);
+
+  status.labels.forEach((line, index) => {
+    const span = document.createElement("span");
+    span.className = "language-line";
+    span.lang = LANGS[index];
+    span.textContent = line;
+    container.append(span);
+  });
+}
+
+function renderSessionCard(slot, session, status) {
   slot.replaceChildren();
   const card = cardTemplate.content.firstElementChild.cloneNode(true);
-  card.classList.toggle("is-current", isCurrent);
+  card.classList.toggle("is-current", status.key === "current");
+  card.dataset.status = status.key;
   card.href = buildFeedbackUrl(session);
   card.target = "_blank";
   card.rel = "noreferrer";
   card.setAttribute(
     "aria-label",
-    `${labels.join(" / ")}：${session.title}。${copy.openForm.join(" / ")}`,
+    `${status.labels.join(" / ")}：${session.title}。${copy.openForm.join(" / ")}`,
   );
-  addLanguageLines(card.querySelector(".session-card__label"), labels);
+  addSessionStatus(card.querySelector(".session-card__label"), status);
   card.querySelector(".session-card__title").textContent = session.title;
   card.querySelector('[data-field="time"]').textContent = formatSessionTime(session);
   card.querySelector('[data-field="room"]').textContent = session.roomName;
@@ -92,10 +116,10 @@ function renderSessionCard(slot, session, labels, isCurrent) {
   slot.append(card);
 }
 
-function sessionLabels(session) {
-  if (!anchorSession || session.id === anchorSession.id) return copy.current;
-  if (session.startAt < anchorSession.startAt) return copy.previous;
-  return copy.next;
+function sessionStatus(session) {
+  if (!anchorSession || session.id === anchorSession.id) return sessionStatuses.current;
+  if (session.startAt < anchorSession.startAt) return sessionStatuses.previous;
+  return sessionStatuses.next;
 }
 
 function updateNavigation(session) {
@@ -134,12 +158,7 @@ async function displaySession(source) {
   const session = await hydrateTrack(source);
   if (version !== renderVersion) return;
 
-  renderSessionCard(
-    selectedSlot,
-    session,
-    sessionLabels(session),
-    session.id === anchorSession.id,
-  );
+  renderSessionCard(selectedSlot, session, sessionStatus(session));
   updateNavigation(source);
   sessionResults.hidden = false;
   if (!session.trackName) {
