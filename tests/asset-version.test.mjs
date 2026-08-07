@@ -33,3 +33,10 @@ test("defines compact English tags for each session state", async () => {
   assert.match(app, /tag: "Ended"/);
   assert.match(app, /tag: "Upcoming"/);
 });
+
+test("uses COSCUP's GA4 measurement ID", async () => {
+  const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
+
+  assert.match(html, /googletagmanager\.com\/gtag\/js\?id=G-C9EMTMDSS1/);
+  assert.match(html, /gtag\("config", "G-C9EMTMDSS1"\)/);
+});
